@@ -1,6 +1,6 @@
 # ✨ Razzle ✨
 
-My build system for server-rendered React apps. 
+My build system for server-rendered React apps.
 
 ### Getting Started
 #### Install globally
