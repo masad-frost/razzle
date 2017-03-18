@@ -1,6 +1,6 @@
 {
   "name": "razzle-examples-simple",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "scripts": {
     "start": "razzle dev",
@@ -15,6 +15,6 @@
     "serialize-javascript": "^1.3.0"
   },
   "devDependencies": {
-    "razzle": "^0.1.0"
+    "razzle": "^0.1.1"
   }
 }
