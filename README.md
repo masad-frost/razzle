@@ -1,4 +1,4 @@
-# ✨ Razzle ✨
+# Razzle ✨
 
 My build system for server-rendered React apps.
 
@@ -17,4 +17,6 @@ cd myApp
 yarn start
 ```
 
+---
+#### Author
 - [Jared Palmer](https://twitter.com/jaredpalmer)

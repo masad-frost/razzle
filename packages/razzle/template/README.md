@@ -1,19 +1,16 @@
-# ✨ Razzle ✨
+# Razzle ✨
 
 My build system for server-rendered React apps. 
 
 ### Getting Started
-#### Install globally
 
 ```bash
-yarn add --global razzle
+yarn install
 ```
 
-#### Scaffold a new project
+#### Start developing
 
 ```bash
-razzle new myApp
-cd myApp
 yarn start
 ```
 
