@@ -1,0 +1,21 @@
+{
+  "name": "babel-preset-razzle",
+  "version": "0.1.0",
+  "description": "Babel presets for Razzle",
+  "main": "index.js",
+  "author": "jaredpalmer",
+  "repository": "git@github.com:jaredpalmer/razzle.git",
+  "license": "MIT",
+  "files": [
+    "index.js"
+  ],
+  "dependencies": {
+    "babel-plugin-syntax-dynamic-import": "^6.18.0",
+    "babel-plugin-transform-class-properties": "^6.23.0",
+    "babel-plugin-transform-es2015-modules-commonjs": "^6.24.0",
+    "babel-plugin-transform-es2015-parameters": "^6.23.0",
+    "babel-plugin-transform-object-rest-spread": "^6.23.0",
+    "babel-preset-env": "^1.2.2",
+    "babel-preset-react": "^6.23.0"
+  }
+}
