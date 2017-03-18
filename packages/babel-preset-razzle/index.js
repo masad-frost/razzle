@@ -41,6 +41,10 @@ if (process.env.NODE_ENV === 'test' || process.env.BABEL_ENV === 'test') {
       require.resolve('babel-plugin-transform-es2015-modules-commonjs'),
       { loose: true },
     ],
+    [
+      // Compiles import() to a deferred require()
+      require.resolve('babel-plugin-dynamic-import-node'),
+    ],
   ]);
 }
 
