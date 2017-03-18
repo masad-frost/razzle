@@ -16,3 +16,5 @@ razzle new myApp
 cd myApp
 yarn start
 ```
+
+- [Jared Palmer](https://twitter.com/jaredpalmer)
