@@ -3,7 +3,7 @@ import ReactLogo from './react.svg';
 
 const Hello = () => (
   <div>
-    Sooo Hello...
+    Sasdf
     <img src={ReactLogo} alt="" />
   </div>
 );

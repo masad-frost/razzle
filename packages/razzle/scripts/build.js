@@ -1,37 +1,131 @@
 #! /usr/bin/env node
+// Do this as the first thing so that any code reading it knows the right env.
+process.env.NODE_ENV = 'production';
+
+// Makes the script crash on unhandled rejections instead of silently
+// ignoring them. In the future, promise rejections that are not handled will
+// terminate the Node.js process with a non-zero exit code.
+process.on('unhandledRejection', err => {
+  throw err;
+});
+
+require('dotenv').config({ silent: true });
 const webpack = require('webpack');
-const createConfig = require('./create-config');
-const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
+const fs = require('fs-extra');
 const chalk = require('chalk');
+const path = require('path');
+const paths = require('../config/paths');
+const createConfig = require('../config/create-config');
+const FileSizeReporter = require('react-dev-utils/FileSizeReporter');
+const measureFileSizesBeforeBuild = FileSizeReporter.measureFileSizesBeforeBuild;
+const printFileSizesAfterBuild = FileSizeReporter.printFileSizesAfterBuild;
 
-const serverConfig = createConfig('node', 'prod');
-const clientConfig = createConfig('web', 'prod');
+// First, read the current file sizes in build directory.
+// This lets us display how much they changed later.
+measureFileSizesBeforeBuild(paths.appBuildPublic).then(previousFileSizes => {
+  // Remove all content but keep the directory so that
+  // if you're in it, you don't end up in Trash
+  fs.emptyDirSync(paths.appBuild);
 
-const compiler = webpack([clientConfig, serverConfig]);
+  // Start the webpack build
+  build(previousFileSizes);
 
-compiler.plugin('invalid', () => {
-  console.log(chalk.cyan('Compiling...'));
+  // Merge with the public folder
+  copyPublicFolder();
 });
 
-compiler.plugin('done', stats => {
-  const rawMessages = stats.toJson({}, true);
-  const messages = formatWebpackMessages(rawMessages);
-  if (!messages.errors.length && !messages.warnings.length) {
-    console.log(chalk.green('Compiled successfully!'));
-  }
-  if (messages.errors.length) {
-    console.log(chalk.red('Failed to compile.'));
-    messages.errors.forEach(e => console.log(e));
-    return;
-  }
-  if (messages.warnings.length) {
-    console.log(chalk.yellow('Compiled with warnings.'));
-    messages.warnings.forEach(w => console.log(w));
-  }
-});
+function build(previousFileSizes) {
+  let clientConfig = createConfig('web', 'prod');
+  let serverConfig = createConfig('node', 'prod');
 
-compiler.run((err, stats) => {
+  let razzle = {};
+  try {
+    razzle = require(paths.appRazzleConfig);
+  } catch (e) {}
+  if (razzle.modify) {
+    clientConfig = razzle.modify(
+      clientConfig,
+      { target: 'web', dev: false },
+      webpack
+    );
+    serverConfig = razzle.modify(
+      serverConfig,
+      { target: 'node', dev: false },
+      webpack
+    );
+  }
+
+  process.noDeprecation = true; // turns off that loadQuery clutter.
+
+  console.log('Creating an optimized production build...');
+  console.log('Compiling client...');
+  compile(clientConfig, (err, clientStats) => {
+    handleWebpackErrors(err, clientStats);
+    console.log(chalk.green('Compiled client successfully.'));
+    console.log('Compiling server...');
+    compile(serverConfig, (err, serverStats) => {
+      handleWebpackErrors(err, serverStats);
+      console.log(chalk.green('Compiled server successfully.'));
+      console.log();
+      console.log('Client File sizes after gzip:');
+      console.log();
+      printFileSizesAfterBuild(clientStats, previousFileSizes);
+      console.log();
+      console.log('You can now start your server in production.');
+      console.log(`   ${chalk.cyan('node ./build/server.js')}`);
+    });
+  });
+}
+
+function copyPublicFolder() {
+  fs.copySync(paths.appPublic, paths.appBuildPublic, {
+    dereference: true,
+    filter: file => file !== paths.appHtml,
+  });
+}
+
+// Print out errors
+function printErrors(summary, errors) {
+  console.log(chalk.red(summary));
+  console.log();
+  errors.forEach(err => {
+    console.log(err.message || err);
+    console.log();
+  });
+}
+
+function compile(config, cb) {
+  let compiler;
+  try {
+    compiler = webpack(config);
+  } catch (e) {
+    printErrors('Failed to compile.', [e]);
+    process.exit(1);
+  }
+  compiler.run((err, stats) => {
+    cb(err, stats);
+  });
+}
+
+function handleWebpackErrors(err, stats) {
   if (err) {
-    console.log(err);
+    printErrors('Failed to compile.', [err]);
+    process.exit(1);
   }
-});
+
+  if (stats.compilation.errors && stats.compilation.errors.length) {
+    printErrors('Failed to compile.', stats.compilation.errors);
+    process.exit(1);
+  }
+  if (
+    process.env.CI &&
+    stats.compilation.warnings &&
+    stats.compilation.warnings.length
+  ) {
+    printErrors(
+      'Failed to compile. When process.env.CI = true, warnings are treated as failures. Most CI servers set this automatically.',
+      stats.compilation.warnings
+    );
+    process.exit(1);
+  }
+}

@@ -1,21 +1,16 @@
 'use strict';
 
-const fs = require('fs');
+const fs = require('fs-extra');
 const path = require('path');
 const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
 const AssetsPlugin = require('assets-webpack-plugin');
 const StartServerPlugin = require('start-server-webpack-plugin');
-
-const rootPath = path.resolve(process.cwd());
-const buildPath = path.join(rootPath, 'build');
-const publicBuildPath = path.join(rootPath, 'public', 'static');
-const userNodeModulesPath = path.join(rootPath, 'node_modules');
-const pubilicPath = '/';
+const WebpackFriendlyErrors = require('friendly-errors-webpack-plugin');
+const paths = require('./paths');
 
 module.exports = (target = 'web', env = 'dev') => {
-  const babelRcPath = path.resolve('.babelrc');
-  const hasBabelRc = fs.existsSync(babelRcPath);
+  const hasBabelRc = fs.existsSync(paths.appBabelRc);
   const mainBabelOptions = {
     babelrc: true,
     cacheDirectory: true,
@@ -23,7 +18,7 @@ module.exports = (target = 'web', env = 'dev') => {
   };
 
   if (hasBabelRc) {
-    console.log('> Using .babelrc defined in your app root');
+    console.log('Using .babelrc defined in your app root');
   } else {
     mainBabelOptions.presets.push(require.resolve('../babel'));
   }
@@ -37,31 +32,25 @@ module.exports = (target = 'web', env = 'dev') => {
   let config = {
     context: process.cwd(),
     target: target,
-    devtool: 'cheap-eval-source-map',
+    devtool: IS_PROD ? 'source-map' : 'cheap-eval-source-map',
     resolve: {
       extensions: ['.js', '.json'],
-      modules: [
-        userNodeModulesPath,
-        path.resolve(__dirname, '../node_modules'),
-      ],
+      modules: ['node_modules'].concat(paths.nodePaths),
     },
     resolveLoader: {
-      modules: [
-        userNodeModulesPath,
-        path.resolve(__dirname, '../node_modules'),
-      ],
+      modules: [paths.appNodeModules, paths.ownNodeModules],
     },
     module: {
       rules: [
         {
           test: /\.js?$/,
           loader: require.resolve('babel-loader'),
-          exclude: [/node_modules/, buildPath],
+          exclude: [/node_modules/, paths.appBuild],
           options: mainBabelOptions,
         },
         {
-          test: /\.(jpg|jpeg|png|gif|eot|ttf|woff|svg|woff2)$/,
-          loader: require.resolve('url-loader'),
+          test: /\.(jpg|jpeg|png|gif|eot|svg|ttf|woff|woff2)$/,
+          loader: 'url-loader',
           options: {
             limit: 20000,
           },
@@ -85,39 +74,34 @@ module.exports = (target = 'web', env = 'dev') => {
     ];
 
     config.output = {
-      path: buildPath,
+      path: paths.appBuild,
       filename: 'server.js',
     };
 
+    config.plugins = [
+      new webpack.NamedModulesPlugin(),
+      new webpack.DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify('production'),
+          BUILD_TARGET: JSON.stringify('server'),
+          RAZZLE_ASSETS_MANIFEST: JSON.stringify(paths.appManifest),
+          RAZZLE_PUBLIC_DIR: JSON.stringify(
+            IS_PROD ? paths.appBuildPublic : paths.appPublic
+          ),
+        },
+      }),
+    ];
+
+    config.entry = [paths.appServerIndexJs];
+
     if (IS_DEV) {
       config.watch = true;
-      config.entry = ['webpack/hot/poll?1000', './server/index'];
+      config.entry.unshift('webpack/hot/poll?1000');
       config.plugins = [
-        new StartServerPlugin('server.js'),
-        new webpack.NamedModulesPlugin(),
+        ...config.plugins,
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoEmitOnErrorsPlugin(),
-        new webpack.DefinePlugin({
-          'process.env': {
-            BUILD_TARGET: JSON.stringify('server'),
-          },
-          ASSETS_MANIFEST: JSON.stringify(
-            path.join(buildPath || '', 'assets.json' || '')
-          ),
-        }),
-      ];
-    } else {
-      config.entry = ['./server/index'];
-      config.plugins = [
-        new webpack.NamedModulesPlugin(),
-        new webpack.DefinePlugin({
-          'process.env': {
-            BUILD_TARGET: JSON.stringify('server'),
-          },
-          ASSETS_MANIFEST: JSON.stringify(
-            path.join(buildPath || '', 'assets.json' || '')
-          ),
-        }),
+        new StartServerPlugin('server.js'),
       ];
     }
   }
@@ -127,15 +111,16 @@ module.exports = (target = 'web', env = 'dev') => {
       config.entry = {
         client: [
           require.resolve('react-hot-loader/patch'),
-          'webpack-dev-server/client?http://localhost:3001',
+          `webpack-dev-server/client?http://localhost:3001`,
           'webpack/hot/only-dev-server',
-          './client/index',
+          paths.appClientIndexJs,
         ],
       };
       config.output = {
-        path: buildPath,
-        publicPath: 'http://localhost:3001/static/',
-        filename: 'client.js',
+        path: paths.appBuildPublic,
+        publicPath: 'http://localhost:3001/',
+        pathinfo: true,
+        filename: 'static/js/[name].js',
       };
       config.devServer = {
         host: 'localhost',
@@ -149,44 +134,51 @@ module.exports = (target = 'web', env = 'dev') => {
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoEmitOnErrorsPlugin(),
         new AssetsPlugin({
-          path: buildPath,
+          path: paths.appBuild,
           filename: 'assets.json',
         }),
         new webpack.DefinePlugin({
           'process.env': {
+            NODE_ENV: JSON.stringify('development'),
             BUILD_TARGET: JSON.stringify('client'),
           },
         }),
       ];
     } else {
       config.entry = {
-        client: ['./client/index'],
+        client: [paths.appClientIndexJs],
       };
       config.output = {
-        path: publicBuildPath,
-        publicPath: '/static/',
-        filename: '[name]-bundle-[hash].js',
+        path: paths.appBuildPublic,
+        publicPath: '/',
+        filename: 'static/js/[name].[chunkhash:8].js',
+        chunkFilename: 'static/js/[name].[chunkhash:8].chunk.js',
       };
       config.performance = { hints: false };
       config.plugins = [
         new webpack.NamedModulesPlugin(),
+        new webpack.DefinePlugin({
+          'process.env': {
+            NODE_ENV: JSON.stringify('production'),
+            BUILD_TARGET: JSON.stringify('client'),
+          },
+        }),
         new webpack.optimize.UglifyJsPlugin({
           compress: { screw_ie8: true, warnings: false },
           mangle: { screw_ie8: true },
           output: { comments: false, screw_ie8: true },
           sourceMap: false,
         }),
-        new webpack.DefinePlugin({
-          'process.env': {
-            BUILD_TARGET: JSON.stringify('client'),
-          },
-        }),
         new AssetsPlugin({
-          path: buildPath,
+          path: paths.appBuild,
           filename: 'assets.json',
         }),
       ];
     }
+  }
+
+  if (IS_DEV && IS_NODE) {
+    config.plugins.push(new WebpackFriendlyErrors());
   }
 
   return config;

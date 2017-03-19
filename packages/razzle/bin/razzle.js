@@ -10,21 +10,36 @@ const packageJson = require('./../package.json');
 const spawn = require('execa');
 const path = require('path');
 
-if (command === 'dev') {
-  spawn('node', [path.resolve(__dirname, '..', 'scripts/dev.js')], {
+if (command === 'start') {
+  spawn.sync('node', [path.resolve(__dirname, '..', 'scripts/start.js')], {
     stdio: 'inherit',
   });
 } else if (command === 'build') {
-  spawn('node', [path.resolve(__dirname, '..', 'scripts/build.js')], {
+  spawn.sync('node', [path.resolve(__dirname, '..', 'scripts/build.js')], {
     stdio: 'inherit',
   });
-} else if (command === 'new') {
-  console.log(chalk.green('Cloning...'));
+} else if (command === 'init') {
+  console.log();
+  console.log(
+    chalk.magenta(
+      `
+      :::::::::      :::     ::::::::: ::::::::: :::        :::::::::: 
+     :+:    :+:   :+: :+:        :+:       :+:  :+:        :+:         
+    +:+    +:+  +:+   +:+      +:+       +:+   +:+        +:+          
+   +#++:++#:  +#++:++#++:    +#+       +#+    +#+        +#++:++#      
+  +#+    +#+ +#+     +#+   +#+       +#+     +#+        +#+            
+ #+#    #+# #+#     #+#  #+#       #+#      #+#        #+#             
+###    ### ###     ### ######### ######### ########## ##########             
+`
+    )
+  );
+  console.log(chalk.magenta('[1/2] 🛠  Creating a new Razzle project...'));
   const { _: [, dest] } = argv;
   const finalDest = path.resolve(process.cwd(), dest);
   ncp(path.resolve(__dirname, '..', 'template'), finalDest, function(err) {
-    console.log(chalk.green('Installing packages...'));
     if (err) return console.error(err);
+    console.log(chalk.magenta('[2/2] ✨  Adding that razzle-dazzle...'));
+    console.log();
     try {
       fs.renameSync(
         path.resolve(finalDest, '.npmignore'),
@@ -35,22 +50,27 @@ if (command === 'dev') {
     spawn('yarn', ['install'], { stdio: 'inherit' })
       .then(() => {
         console.log();
-        console.log(chalk.yellow(`
-8888888b.                             888            Λ         
-888   Y88b                            888           <8>   Λ    
-888    888                            888            V    8    
-888   d88P  8888b.  88888888 88888888 888  .d88b.        d8b   
-8888888P"      "88b    d88P     d88P  888 d8P  Y8b    <od888bo>
-888 T88b   .d888888   d88P     d88P   888 88888888       T8P   
-888  T88b  888  888  d88P     d88P    888 Y8b.        Λ   8    
-888   T88b "Y888888 88888888 88888888 888  "Y8888    <8>  V    
-                                                      V                
-`));
         console.log();
-        console.log(chalk.green(`   Your new Razzle project is ready!`));
+
         console.log();
-        console.log(chalk.cyan(`   cd ${dest} && yarn start`));
+        console.log(`Success! Created ${dest} at ${finalDest}`);
+        console.log('Inside that directory, you can run several commands:');
         console.log();
+        console.log(chalk.cyan('  yarn start'));
+        console.log('    Starts the development server.');
+        console.log();
+        console.log(chalk.cyan('  yarn build'));
+        console.log('    Bundles the client and server for production.');
+        console.log();
+        console.log();
+        console.log(chalk.cyan('  yarn start:prod'));
+        console.log('    Bundles the client and server for production.');
+        console.log();
+        console.log();
+        console.log('We suggest that you begin by typing:');
+        console.log();
+        console.log(chalk.cyan('  cd'), dest);
+        console.log(`  ${chalk.cyan('yarn start')}`);
       })
       .catch(e => {
         console.error(e);
@@ -59,5 +79,5 @@ if (command === 'dev') {
 } else if (!command && (argv.v || argv.version)) {
   console.log(chalk.cyan(`Razzle ${packageJson.version}`));
 } else {
-  console.log(chalk.red('Valid commands: run; build; new'));
+  console.log(chalk.red('Valid commands: start; build; init'));
 }
