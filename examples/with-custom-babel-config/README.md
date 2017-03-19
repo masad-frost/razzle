@@ -16,4 +16,4 @@ yarn start
 ```
 
 ## Idea behind the example
-This is a basic example of how extends Razzle with a custom `.babelrc` file.
+This is a basic example of how to extend Razzle with a custom `.babelrc` file.
