@@ -1,4 +1,4 @@
-# Simple Example
+# Razzle Simple Example
 
 ## How to use
 Download the example [or clone the whole project](https://github.com/jaredpalmer/razzle.git):

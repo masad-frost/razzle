@@ -10,10 +10,10 @@ if (module.hot) {
 
 export default express()
   .use((req, res) => app.handle(req, res))
-  .listen(process.env.PORT || 3000, function(err) {
+  .listen(3000, function(err) {
     if (err) {
       console.error(err);
       return;
     }
-    console.log(`> Started on 3000`);
+    console.log('> Started on http://localhost:3000');
   });

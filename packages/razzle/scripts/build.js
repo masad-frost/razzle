@@ -35,13 +35,13 @@ measureFileSizesBeforeBuild(paths.appBuildPublic).then(previousFileSizes => {
 });
 
 function build(previousFileSizes) {
-  let clientConfig = createConfig('web', 'prod');
-  let serverConfig = createConfig('node', 'prod');
-
   let razzle = {};
   try {
     razzle = require(paths.appRazzleConfig);
   } catch (e) {}
+  let clientConfig = createConfig('web', 'prod', razzle);
+  let serverConfig = createConfig('node', 'prod', razzle);
+
   if (razzle.modify) {
     clientConfig = razzle.modify(
       clientConfig,

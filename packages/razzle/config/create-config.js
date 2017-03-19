@@ -6,10 +6,10 @@ const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
 const AssetsPlugin = require('assets-webpack-plugin');
 const StartServerPlugin = require('start-server-webpack-plugin');
-const WebpackFriendlyErrors = require('friendly-errors-webpack-plugin');
+const WebpackUniversalErrorsPlugin = require('./WebpackUniversalErrorPlugin');
 const paths = require('./paths');
 
-module.exports = (target = 'web', env = 'dev') => {
+module.exports = (target = 'web', env = 'dev', options = {}) => {
   const hasBabelRc = fs.existsSync(paths.appBabelRc);
   const mainBabelOptions = {
     babelrc: true,
@@ -88,6 +88,7 @@ module.exports = (target = 'web', env = 'dev') => {
           RAZZLE_PUBLIC_DIR: JSON.stringify(
             IS_PROD ? paths.appBuildPublic : paths.appPublic
           ),
+          PORT: options.port || 3000,
         },
       }),
     ];
@@ -111,20 +112,21 @@ module.exports = (target = 'web', env = 'dev') => {
       config.entry = {
         client: [
           require.resolve('react-hot-loader/patch'),
-          `webpack-dev-server/client?http://localhost:3001`,
+          `webpack-dev-server/client?http://0.0.0.0:${options.port + 1 || '3001'}`,
           'webpack/hot/only-dev-server',
           paths.appClientIndexJs,
         ],
       };
+
       config.output = {
         path: paths.appBuildPublic,
-        publicPath: 'http://localhost:3001/',
+        publicPath: `http://0.0.0.0:${options.port + 1 || '3001'}/`,
         pathinfo: true,
         filename: 'static/js/[name].js',
       };
       config.devServer = {
-        host: 'localhost',
-        port: 3001,
+        host: '0.0.0.0',
+        port: options.port + 1 || 3001,
         quiet: true,
         historyApiFallback: true,
         hot: true,
@@ -177,8 +179,12 @@ module.exports = (target = 'web', env = 'dev') => {
     }
   }
 
-  if (IS_DEV && IS_NODE) {
-    config.plugins.push(new WebpackFriendlyErrors());
+  if (IS_DEV) {
+    config.plugins.push(
+      new WebpackUniversalErrorsPlugin({
+        clearConsole: options.quiet || true,
+      })
+    );
   }
 
   return config;

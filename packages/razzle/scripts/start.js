@@ -8,13 +8,13 @@ const chalk = require('chalk');
 
 process.noDeprecation = true; // turns off that loadQuery clutter.
 
+let razzle = {};
 try {
   razzle = require(path.resolve(process.cwd(), 'razzle.config.js'));
 } catch (e) {}
 
-let clientConfig = createConfig('web', 'dev');
-let serverConfig = createConfig('node', 'dev');
-let razzle = {};
+let clientConfig = createConfig('web', 'dev', razzle);
+let serverConfig = createConfig('node', 'dev', razzle);
 
 if (razzle.modify) {
   clientConfig = razzle.modify(
@@ -32,9 +32,12 @@ if (razzle.modify) {
 const clientCompiler = webpack(clientConfig);
 const clientDevServer = new devServer(clientCompiler, clientConfig.devServer);
 
-clientDevServer.listen(3001, err => {
-  buildServer();
-});
+clientDevServer.listen(
+  (razzle.options && razzle.options.port + 1) || 3001,
+  err => {
+    buildServer();
+  }
+);
 
 // setTimeout(buildServer, 1000);
 
