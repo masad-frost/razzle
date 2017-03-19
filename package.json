@@ -2,6 +2,22 @@
   "bugs": "https://github.com/jaredpalmer/razzle/issues",
   "homepage": "https://github.com/jaredpalmer/razzle#readme",
   "devDependencies": {
-    "lerna": "2.0.0-beta.32"
+    "husky": "^0.13.2",
+    "lerna": "2.0.0-beta.38",
+    "lerna-changelog": "^0.3.0",
+    "lint-staged": "^3.4.0",
+    "prettier": "^0.22.0"
+  },
+  "scripts": {
+    "postinstall": "lerna bootstrap",
+    "changelog": "lerna-changelog",
+    "format": "prettier --trailing-comma es5 --single-quote --write 'packages/*/*.js' 'packages/*/!(node_modules)/**/*.js'",
+    "precommit": "lint-staged"
+  },
+  "lint-staged": {
+    "*.js": [
+      "prettier --trailing-comma es5 --single-quote --write",
+      "git add"
+    ]
   }
 }
