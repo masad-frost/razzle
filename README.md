@@ -1,4 +1,4 @@
-![razzle](https://cloud.githubusercontent.com/assets/4060187/24077343/7d2809e6-0c20-11e7-9e85-0da1455c6b08.png)
+![razzle](https://cloud.githubusercontent.com/assets/4060187/24077825/4ef23636-0c30-11e7-807d-62b91db7aa7e.png)
 
 # Razzle ✨
 
