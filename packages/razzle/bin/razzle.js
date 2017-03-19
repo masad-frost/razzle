@@ -71,6 +71,7 @@ if (command === 'start') {
         console.log();
         console.log(chalk.cyan('  cd'), dest);
         console.log(`  ${chalk.cyan('yarn start')}`);
+        console.log();
       })
       .catch(e => {
         console.error(e);

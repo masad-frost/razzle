@@ -39,8 +39,6 @@ clientDevServer.listen(
   }
 );
 
-// setTimeout(buildServer, 1000);
-
 function buildServer() {
   const serverCompiler = webpack(serverConfig);
   serverCompiler.watch(
