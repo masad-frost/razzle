@@ -96,7 +96,6 @@ There are just a settings you should know about. `port` and `quiet`...
 // razzle.config.js
 
 module.exports = {
-  quiet: false, // Razzle;s logger will NOT clear console after changes
   port: 3000, // Changes default port setting
   modify: (config, { dev }, webpack) => {
     // do something and return config
