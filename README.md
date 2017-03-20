@@ -23,7 +23,7 @@ yarn start
 
 ## 25 seconds to bootstrap
 
-![razzle_onboard](https://cloud.githubusercontent.com/assets/4060187/24085928/37fa548a-0cdb-11e7-932a-13f7b02480a5.gif)
+<img src="https://cloud.githubusercontent.com/assets/4060187/24085928/37fa548a-0cdb-11e7-932a-13f7b02480a5.gif" width="500px" alt="Razzle Onboarding"/>
 
 
 ### Inspiration
