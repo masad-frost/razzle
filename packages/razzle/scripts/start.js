@@ -5,6 +5,7 @@ const webpack = require('webpack');
 const createConfig = require('../config/create-config');
 const devServer = require('webpack-dev-server');
 const chalk = require('chalk');
+const clearConsole = require('react-dev-utils/clearConsole');
 
 process.noDeprecation = true; // turns off that loadQuery clutter.
 
@@ -33,6 +34,11 @@ const clientCompiler = webpack(clientConfig);
 const serverCompiler = webpack(serverConfig);
 const clientDevServer = new devServer(clientCompiler, clientConfig.devServer);
 
+clearConsole();
+console.log(
+  chalk.bgBlue(`${chalk.black(' WAIT ')}`) + ' ' + chalk.blue('Compiling...')
+);
+
 clientDevServer.listen(
   (razzle.options && razzle.options.port + 1) || 3001,
   err => {
@@ -44,8 +50,9 @@ clientDevServer.listen(
 
 serverCompiler.watch(
   {
-    noInfo: true,
+    quiet: true,
     stats: 'none',
+    ignored: 'build/assets.json',
   },
-  () => undefined
+  stats => {}
 );

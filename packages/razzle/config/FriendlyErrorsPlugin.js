@@ -4,11 +4,10 @@ const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 
 let isFirst = true;
 
-class WebpackUniversalErrorPlugin {
+class WebpackErrorsPlugin {
   constructor(options) {
     options = options || {};
-    this.target = options.target === 'web' ? 'Client' : 'Server';
-    this.env = options.env || 'dev';
+    this.onSuccessMessage = options.onSuccessMessage;
   }
 
   apply(compiler) {
@@ -16,26 +15,26 @@ class WebpackUniversalErrorPlugin {
       const rawMessages = stats.toJson({}, true);
       const messages = formatWebpackMessages(rawMessages);
 
-      if (this.target === 'Server' && this.env === 'dev' && isFirst) {
-        isFirst = false;
-        return;
-      }
-
       if (!messages.errors.length && !messages.warnings.length) {
+        clearConsole();
         console.log(
           chalk.bgGreen.black(' DONE ') +
             ' ' +
-            chalk.green(`Compiled ${this.target} successfully`)
+            chalk.green(`Compiled successfully`)
         );
+        if (this.onSuccessMessage) {
+          console.log();
+          console.log(this.onSuccessMessage);
+          console.log();
+        }
       }
 
       if (messages.errors.length) {
+        clearConsole();
         console.log(
           chalk.bgRed.black(' ERROR ') +
             ' ' +
-            chalk.red(
-              `Failed to compile ${this.target} with ${messages.errors.length} errors`
-            )
+            chalk.red(`Failed to compile with ${messages.errors.length} errors`)
         );
         console.log();
         messages.errors.forEach(e => console.log(e));
@@ -43,11 +42,12 @@ class WebpackUniversalErrorPlugin {
       }
 
       if (messages.warnings.length) {
+        clearConsole();
         console.log(
           chalk.bgYellow.black(' WARNING ') +
             ' ' +
             chalk.res(
-              `Failed to compile ${this.target} with ${messages.warnings.length} warnings`
+              `Failed to compile with ${messages.warnings.length} warnings`
             )
         );
         console.log();
@@ -56,13 +56,12 @@ class WebpackUniversalErrorPlugin {
     });
 
     compiler.plugin('invalid', params => {
+      clearConsole();
       console.log(
-        chalk.bgCyan.black(' WAIT ') +
-          ' ' +
-          chalk.cyan(`Compiling ${this.target}...`)
+        chalk.bgBlue.black(' WAIT ') + ' ' + chalk.blue(`Compiling...`)
       );
     });
   }
 }
 
-module.exports = WebpackUniversalErrorPlugin;
+module.exports = WebpackErrorsPlugin;

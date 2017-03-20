@@ -6,7 +6,7 @@ const webpack = require('webpack');
 const nodeExternals = require('webpack-node-externals');
 const AssetsPlugin = require('assets-webpack-plugin');
 const StartServerPlugin = require('start-server-webpack-plugin');
-const WebpackUniversalErrorsPlugin = require('./WebpackUniversalErrorPlugin');
+const FriendlyErrorsPlugin = require('./FriendlyErrorsPlugin');
 const paths = require('./paths');
 
 module.exports = (target = 'web', env = 'dev', options = {}) => {
@@ -64,7 +64,7 @@ module.exports = (target = 'web', env = 'dev', options = {}) => {
     config.externals = [
       nodeExternals({
         whitelist: [
-          'webpack/hot/poll?1000',
+          'webpack/hot/poll?300',
           /\.(eot|woff|woff2|ttf|otf)$/,
           /\.(svg|png|jpg|jpeg|gif|ico)$/,
           /\.(mp4|mp3|ogg|swf|webp)$/,
@@ -97,7 +97,7 @@ module.exports = (target = 'web', env = 'dev', options = {}) => {
 
     if (IS_DEV) {
       config.watch = true;
-      config.entry.unshift('webpack/hot/poll?1000');
+      config.entry.unshift('webpack/hot/poll?300');
       config.plugins = [
         ...config.plugins,
         new webpack.HotModuleReplacementPlugin(),
@@ -127,6 +127,7 @@ module.exports = (target = 'web', env = 'dev', options = {}) => {
       config.devServer = {
         host: '0.0.0.0',
         port: options.port + 1 || 3001,
+        noInfo: true,
         quiet: true,
         historyApiFallback: true,
         hot: true,
@@ -179,11 +180,10 @@ module.exports = (target = 'web', env = 'dev', options = {}) => {
     }
   }
 
-  if (IS_DEV) {
+  if (IS_DEV && IS_NODE) {
     config.plugins.push(
-      new WebpackUniversalErrorsPlugin({
-        target,
-        env,
+      new FriendlyErrorsPlugin({
+        onSuccessMessage: `Your application is running at http://0.0.0.0:${options.port || 3000}`,
       })
     );
   }
