@@ -64,7 +64,7 @@ if (command === 'start') {
         console.log();
         console.log();
         console.log(chalk.cyan('  yarn start:prod'));
-        console.log('    Bundles the client and server for production.');
+        console.log('    Starts your application in production.');
         console.log();
         console.log();
         console.log('We suggest that you begin by typing:');
