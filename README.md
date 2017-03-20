@@ -56,23 +56,6 @@ module.exports = {
 }
 ```
 
-### `razzle.config.js` Reference
-
-There are just a settings you should know about. `port` and `quiet`...
-```js
-// razzle.config.js
-
-module.exports = {
-  quiet: false, // Razzle;s logger will NOT clear console after changes
-  port: 3000, // Changes default port setting
-  modify: (config, { dev }, webpack) => {
-    // do something and return config
-  
-    return config
-  }
-}
-```
-
 ### Webpack Flags
 
 - `process.env.RAZZLE_PUBLIC_DIR`: Path to the public directory.
@@ -104,6 +87,23 @@ or
 
 ```
 yarn run start:prod
+```
+
+### `razzle.config.js`
+
+There are just a settings you should know about. `port` and `quiet`...
+```js
+// razzle.config.js
+
+module.exports = {
+  quiet: false, // Razzle;s logger will NOT clear console after changes
+  port: 3000, // Changes default port setting
+  modify: (config, { dev }, webpack) => {
+    // do something and return config
+  
+    return config
+  }
+}
 ```
 
 
