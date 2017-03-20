@@ -182,7 +182,8 @@ module.exports = (target = 'web', env = 'dev', options = {}) => {
   if (IS_DEV) {
     config.plugins.push(
       new WebpackUniversalErrorsPlugin({
-        clearConsole: options.quiet || true,
+        target,
+        env,
       })
     );
   }

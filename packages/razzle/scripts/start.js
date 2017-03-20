@@ -30,22 +30,22 @@ if (razzle.modify) {
 }
 
 const clientCompiler = webpack(clientConfig);
+const serverCompiler = webpack(serverConfig);
 const clientDevServer = new devServer(clientCompiler, clientConfig.devServer);
 
 clientDevServer.listen(
   (razzle.options && razzle.options.port + 1) || 3001,
   err => {
-    buildServer();
+    if (err) {
+      console.error(err);
+    }
   }
 );
 
-function buildServer() {
-  const serverCompiler = webpack(serverConfig);
-  serverCompiler.watch(
-    {
-      noInfo: true,
-      stats: 'none',
-    },
-    () => undefined
-  );
-}
+serverCompiler.watch(
+  {
+    noInfo: true,
+    stats: 'none',
+  },
+  () => undefined
+);
