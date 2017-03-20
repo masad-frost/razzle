@@ -91,7 +91,8 @@ yarn run start:prod
 
 ### `razzle.config.js`
 
-There are just a settings you should know about. `port` and `quiet`...
+There are just a few settings you should know about. 
+
 ```js
 // razzle.config.js
 
