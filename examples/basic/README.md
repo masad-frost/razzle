@@ -1,10 +1,10 @@
-# Razzle Simple Example
+# Razzle Basic Example
 
 ## How to use
 Download the example [or clone the whole project](https://github.com/jaredpalmer/razzle.git):
 
 ```bash
-curl https://codeload.github.com/jaredpalmer/razzle/tar.gz/master | tar -xz --strip=2 razzle-master/examples/simple
+curl https://codeload.github.com/jaredpalmer/razzle/tar.gz/master | tar -xz --strip=2 razzle-master/examples/basic
 cd basic
 ```
 
