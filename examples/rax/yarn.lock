@@ -3444,6 +3444,14 @@ range-parser@^1.0.3, range-parser@~1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/range-parser/-/range-parser-1.2.0.tgz#f49be6b487894ddc40dcc94a322f611092e00d5e"
 
+rax-button@^0.2.5:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/rax-button/-/rax-button-0.2.5.tgz#68393a3c9baf46131d90bd958aef219370a3daf8"
+  dependencies:
+    rax-text "^0.2.5"
+    rax-touchable "^0.2.5"
+    universal-env "^0.2.5"
+
 rax-image@^0.2.5:
   version "0.2.5"
   resolved "https://registry.yarnpkg.com/rax-image/-/rax-image-0.2.5.tgz#c2da8cfc7da18dbdf3a4075ffae739f7b07b1f7b"
@@ -3459,6 +3467,13 @@ rax-text@^0.2.5:
   version "0.2.5"
   resolved "https://registry.yarnpkg.com/rax-text/-/rax-text-0.2.5.tgz#1aed58e8413b71be83d64a4308e069b426b64cf0"
   dependencies:
+    universal-env "^0.2.5"
+
+rax-touchable@^0.2.5:
+  version "0.2.5"
+  resolved "https://registry.yarnpkg.com/rax-touchable/-/rax-touchable-0.2.5.tgz#c1db3db81eac1a4a0360d15f5596b88a3c9c605c"
+  dependencies:
+    rax-view "^0.2.5"
     universal-env "^0.2.5"
 
 rax-view@^0.2.5:
