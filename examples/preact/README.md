@@ -16,7 +16,7 @@ yarn start
 ```
 
 ## Idea behind the example
-This shows how to setup Preact SSR Razzle in a project. 
+This shows how to setup [Preact](https://github.com/developit/preact) with Razzle. 
 
 Here is a list of changes from Razzle's base template:
 
