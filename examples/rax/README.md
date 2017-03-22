@@ -5,7 +5,7 @@ Download the example [or clone the whole project](https://github.com/jaredpalmer
 
 ```bash
 curl https://codeload.github.com/jaredpalmer/razzle/tar.gz/master | tar -xz --strip=2 razzle-master/examples/rax
-cd basic
+cd rax
 ```
 
 Install it and run:
