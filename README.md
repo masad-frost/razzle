@@ -2,23 +2,31 @@
 
 # Razzle ✨
 
-A zero-config, razzle-dazzle build system for universal React applications.
-
-## Features
-
- - 🌎 **Universal Hotness** Both the client and server use hot module replacement.
- - ⚛️ **Babel / Webpack Goodness**
- - 🚫 **Zero-Config*ness*?**
+A zero-config, razzle-dazzle build system for universal JavaScript applications.
 
 ## Quick Overview
 
 ```bash
 yarn add --global razzle
 
-razzle new myApp
+razzle init myApp
 cd myApp
 yarn start
 ```
+
+## Features
+
+- Like Facebook's [create-react-app](https://github.com/facebookincubator/create-react-app), but for universal apps.
+- Uses Webpack Hot Module Replacement on both the client and server. You type, and Razzle will take care of the rest.
+- Comes with your favorite ES6 JavaScript goodies, `babel-preset-razzle`...(hey that rhymes!)
+- Agnostic about data fetching and routing.
+- Agnostic about CSS-in-JS or styling.
+- Works with React, [Preact](https://github.com/developit/preact), [Inferno](https://github.com/infernojs), [Rax](https://github.com/alibaba/rax), Vue, and Angular 2.
+- Next.js-like customization API via `razzle.config.js`.
+
+## Motivation
+
+Universal JavaScript applications are tough to setup. Getting your build system just right can take days or maybe even weeks. Razzle aims to fill this void by giving you a universal build system out of the box and then gets out of hell out of your way. Redux? Mobx? Styled Components? CSS? Flow? Preact? Go knock yourself out. Razzle doesn't care. It will hot reload pretty much anything you can throw at it.
 
 ## 25 seconds to bootstrap
 
