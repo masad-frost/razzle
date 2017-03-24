@@ -7,7 +7,7 @@ A zero-config, razzle-dazzle build system for universal JavaScript applications.
 ## Quick Overview
 
 ```bash
-yarn add --global razzle
+$ yarn add razzle --global
 
 razzle init myApp
 cd myApp
