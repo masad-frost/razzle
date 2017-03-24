@@ -7,6 +7,8 @@ const nodeExternals = require('webpack-node-externals');
 const AssetsPlugin = require('assets-webpack-plugin');
 const StartServerPlugin = require('start-server-webpack-plugin');
 const FriendlyErrorsPlugin = require('./FriendlyErrorsPlugin');
+const autoprefixer = require('autoprefixer');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const paths = require('./paths');
 
 module.exports = (target = 'web', env = 'dev', options = {}) => {
@@ -42,18 +44,92 @@ module.exports = (target = 'web', env = 'dev', options = {}) => {
     },
     module: {
       rules: [
+        // Disable require.ensure as it's not a standard language feature.
+        { parser: { requireEnsure: false } },
         {
           test: /\.js?$/,
           loader: require.resolve('babel-loader'),
-          exclude: [/node_modules/, paths.appBuild],
+          exclude: [paths.appNodeModules, paths.appBuild],
           options: mainBabelOptions,
         },
         {
           test: /\.(jpg|jpeg|png|gif|eot|svg|ttf|woff|woff2)$/,
           loader: 'url-loader',
+          exclude: [paths.appNodeModules, paths.appBuild],
           options: {
             limit: 20000,
           },
+        },
+        // "postcss" loader applies autoprefixer to our CSS.
+        // "css" loader resolves paths in CSS and adds assets as dependencies.
+        // "style" loader turns CSS into JS modules that inject <style> tags.
+        // In production, we use a plugin to extract that CSS to a file, but
+        // in development "style" loader enables hot editing of CSS.
+        {
+          test: /\.css$/,
+          exclude: [paths.appNodeModules, paths.appBuild],
+          use: IS_NODE
+            ? [
+                {
+                  loader: 'css-loader',
+                  options: {
+                    importLoaders: 1,
+                  },
+                },
+              ]
+            : IS_DEV
+                ? [
+                    'style-loader',
+                    {
+                      loader: 'css-loader',
+                      options: {
+                        importLoaders: 1,
+                      },
+                    },
+                    {
+                      loader: 'postcss-loader',
+                      options: {
+                        ident: 'postcss', // https://webpack.js.org/guides/migrating/#complex-options
+                        plugins: () => [
+                          autoprefixer({
+                            browsers: [
+                              '>1%',
+                              'last 4 versions',
+                              'Firefox ESR',
+                              'not ie < 9', // React doesn't support IE8 anyway
+                            ],
+                          }),
+                        ],
+                      },
+                    },
+                  ]
+                : ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: [
+                      {
+                        loader: 'css-loader',
+                        options: {
+                          importLoaders: 1,
+                        },
+                      },
+                      {
+                        loader: 'postcss-loader',
+                        options: {
+                          ident: 'postcss', // https://webpack.js.org/guides/migrating/#complex-options
+                          plugins: () => [
+                            autoprefixer({
+                              browsers: [
+                                '>1%',
+                                'last 4 versions',
+                                'Firefox ESR',
+                                'not ie < 9', // React doesn't support IE8 anyway
+                              ],
+                            }),
+                          ],
+                        },
+                      },
+                    ],
+                  }),
         },
       ],
     },
@@ -104,10 +180,24 @@ module.exports = (target = 'web', env = 'dev', options = {}) => {
         new webpack.NoEmitOnErrorsPlugin(),
         new StartServerPlugin('server.js'),
       ];
+    } else {
+      config.plugins.push(
+        new ExtractTextPlugin({
+          filename: 'static/css/[name].[contenthash:8].css',
+        })
+      );
     }
   }
 
   if (IS_WEB) {
+    config.plugins = [
+      new webpack.NamedModulesPlugin(),
+      new AssetsPlugin({
+        path: paths.appBuild,
+        filename: 'assets.json',
+      }),
+    ];
+
     if (IS_DEV) {
       config.entry = {
         client: [
@@ -133,13 +223,9 @@ module.exports = (target = 'web', env = 'dev', options = {}) => {
         hot: true,
       };
       config.plugins = [
-        new webpack.NamedModulesPlugin(),
+        ...config.plugins,
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoEmitOnErrorsPlugin(),
-        new AssetsPlugin({
-          path: paths.appBuild,
-          filename: 'assets.json',
-        }),
         new webpack.DefinePlugin({
           'process.env': {
             NODE_ENV: JSON.stringify('development'),
@@ -159,7 +245,12 @@ module.exports = (target = 'web', env = 'dev', options = {}) => {
       };
       config.performance = { hints: false };
       config.plugins = [
-        new webpack.NamedModulesPlugin(),
+        ...config.plugins,
+        new ExtractTextPlugin({
+          filename: IS_DEV
+            ? 'static/css/[name].css'
+            : 'static/css/[name].[contenthash:8].css',
+        }),
         new webpack.DefinePlugin({
           'process.env': {
             NODE_ENV: JSON.stringify('production'),
@@ -171,10 +262,6 @@ module.exports = (target = 'web', env = 'dev', options = {}) => {
           mangle: { screw_ie8: true },
           output: { comments: false, screw_ie8: true },
           sourceMap: false,
-        }),
-        new AssetsPlugin({
-          path: paths.appBuild,
-          filename: 'assets.json',
         }),
       ];
     }
