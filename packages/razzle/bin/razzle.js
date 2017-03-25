@@ -51,7 +51,6 @@ if (command === 'start') {
       .then(() => {
         console.log();
         console.log();
-
         console.log();
         console.log(`Success! Created ${dest} at ${finalDest}`);
         console.log('Inside that directory, you can run several commands:');
@@ -61,7 +60,6 @@ if (command === 'start') {
         console.log();
         console.log(chalk.cyan('  yarn build'));
         console.log('    Bundles the client and server for production.');
-        console.log();
         console.log();
         console.log(chalk.cyan('  yarn start:prod'));
         console.log('    Starts your application in production.');
