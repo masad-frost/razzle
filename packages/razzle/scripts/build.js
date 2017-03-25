@@ -35,13 +35,17 @@ measureFileSizesBeforeBuild(paths.appBuildPublic).then(previousFileSizes => {
 });
 
 function build(previousFileSizes) {
+  // Check if razzle.config.js exists
   let razzle = {};
   try {
     razzle = require(paths.appRazzleConfig);
   } catch (e) {}
+  // Create our production webpack configurations and pass in razzle options.
   let clientConfig = createConfig('web', 'prod', razzle);
   let serverConfig = createConfig('node', 'prod', razzle);
 
+  // Check if razzle.config has a modify function. If it does, call it on the
+  // configs we just created.
   if (razzle.modify) {
     clientConfig = razzle.modify(
       clientConfig,
@@ -59,6 +63,9 @@ function build(previousFileSizes) {
 
   console.log('Creating an optimized production build...');
   console.log('Compiling client...');
+  // First compile the client. We need it to properly output assets.json (asset
+  // manifest file with the correct hashes on file names BEFORE we can start
+  // the server compiler.
   compile(clientConfig, (err, clientStats) => {
     handleWebpackErrors(err, clientStats);
     console.log(chalk.green('Compiled client successfully.'));
@@ -77,6 +84,7 @@ function build(previousFileSizes) {
   });
 }
 
+// Helper function to copy public directory to build/public
 function copyPublicFolder() {
   fs.copySync(paths.appPublic, paths.appBuildPublic, {
     dereference: true,
@@ -94,6 +102,7 @@ function printErrors(summary, errors) {
   });
 }
 
+// Wrap webpack compile in a try catch.
 function compile(config, cb) {
   let compiler;
   try {
@@ -107,6 +116,7 @@ function compile(config, cb) {
   });
 }
 
+// Gracefully handle errors and print them to console.
 function handleWebpackErrors(err, stats) {
   if (err) {
     printErrors('Failed to compile.', [err]);

@@ -2,18 +2,12 @@
 
 const path = require('path');
 const fs = require('fs-extra');
-const rootPath = path.resolve(process.cwd());
-const buildPath = path.join(rootPath, 'build');
-const publicBuildPath = path.join(buildPath, 'public', 'static');
-const userNodeModulesPath = path.join(rootPath, 'node_modules');
 
 const nodePaths = (process.env.NODE_PATH || '')
   .split(process.platform === 'win32' ? ';' : ':')
   .filter(Boolean)
   .filter(folder => !path.isAbsolute(folder))
   .map(resolveApp);
-
-const envPublicUrl = process.env.PUBLIC_URL;
 
 function ensureSlash(path, needsSlash) {
   const hasSlash = path.endsWith('/');
@@ -26,13 +20,10 @@ function ensureSlash(path, needsSlash) {
   }
 }
 
-function getPublicUrl(appPackageJson) {
-  return envPublicUrl || require(appPackageJson).homepage;
-}
-
 // Make sure any symlinks in the project folder are resolved:
 // https://github.com/facebookincubator/create-react-app/issues/637
 const appDirectory = fs.realpathSync(process.cwd());
+
 function resolveApp(relativePath) {
   return path.resolve(appDirectory, relativePath);
 }

@@ -1,9 +1,12 @@
+'use strict';
+
 const chalk = require('chalk');
 const clearConsole = require('react-dev-utils/clearConsole');
 const formatWebpackMessages = require('react-dev-utils/formatWebpackMessages');
 
-let isFirst = true;
-
+// This is a custom Webpack Plugin that prints out prettier console messages
+// and errors depending on webpack compiler events. It runs on the Node.js
+// server webpack instance.
 class WebpackErrorsPlugin {
   constructor(options) {
     options = options || {};
