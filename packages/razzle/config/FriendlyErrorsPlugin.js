@@ -49,7 +49,7 @@ class WebpackErrorsPlugin {
         console.log(
           chalk.bgYellow.black(' WARNING ') +
             ' ' +
-            chalk.res(
+            chalk.red(
               `Failed to compile with ${messages.warnings.length} warnings`
             )
         );
