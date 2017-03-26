@@ -1,6 +1,6 @@
 {
   "name": "razzle",
-  "version": "0.2.4",
+  "version": "0.2.5",
   "description": "Build isomorphic react applications with ease.",
   "repository": "git@github.com:jaredpalmer/razzle.git",
   "author": "jaredpalmer",
